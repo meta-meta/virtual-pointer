@@ -1,10 +1,11 @@
-/*! virtual-pointer - v0.0.1 - 2013-07-01
+/*! virtual-pointer - v0.0.1 - 2016-06-27
 * https://github.com/ngryman/virtual-pointer
-* Copyright (c) 2013 Nicolas Gryman; Licensed MIT */
+* Copyright (c) 2016 Nicolas Gryman; Licensed MIT */
 
 (function($, window) {
 
-	var hasTouch = 'ontouchstart' in window,
+	// ignore the fact that PhantomJS registers as a touch browser
+	var hasTouch = false, // 'ontouchstart' in window,
 		startEvent = hasTouch ? 'touchstart' : 'mousedown',
 		stopEvent = hasTouch ? 'touchend' : 'mouseup',
 		moveEvent = hasTouch ? 'touchmove' : 'mousemove';
@@ -86,8 +87,6 @@
 					y = pos.top;
 				}
 
-				this.tapStart();
-
 				var sx = this.x, sy = this.y;
 				(function mv() {
 					var now = Date.now();
@@ -98,7 +97,6 @@
 							this.y = sy + y;
 							this.trigger(moveEvent);
 						}
-						this.tapEnd();
 						callback && callback.call(scope);
 						return;
 					}
@@ -148,7 +146,11 @@
 				}
 
 				duration = duration || this.FLICK_DURATION * 1.5 /* security */;
-				this.move(x, y, duration, callback);
+				this.tapStart();
+				this.move(x, y, duration, function() {
+					this.tapEnd();
+					callback && callback();
+				}.bind(this));
 			},
 
 			flick: function(x, y, callback, duration) {
@@ -164,7 +166,11 @@
 				}
 
 				duration = duration || this.FLICK_DURATION * 0.5 /* security */;
-				this.move(x, y, duration, callback);
+				this.tapStart();
+				this.move(x, y, duration, function() {
+					this.tapEnd();
+					callback && callback();
+				}.bind(this));
 			},
 
 			START_EVENT: startEvent,

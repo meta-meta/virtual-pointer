@@ -1,6 +1,7 @@
 (function($, window) {
 
-	var hasTouch = 'ontouchstart' in window,
+	// ignore the fact that PhantomJS registers as a touch browser
+	var hasTouch = false, // 'ontouchstart' in window,
 		startEvent = hasTouch ? 'touchstart' : 'mousedown',
 		stopEvent = hasTouch ? 'touchend' : 'mouseup',
 		moveEvent = hasTouch ? 'touchmove' : 'mousemove';
